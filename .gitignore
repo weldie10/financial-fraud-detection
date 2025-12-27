@@ -38,7 +38,15 @@ ENV/
 *.ipynb_checkpoints/
 
 # Data files
-data/
+data/raw/
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/*.pkl
+data/processed/*.pickle
+# Allow visualization images for reports
+!data/processed/eda_outputs/*.png
+!data/processed/eda_outputs/*.jpg
+!data/processed/eda_outputs/*.jpeg
 *.csv
 *.parquet
 *.pkl

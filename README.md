@@ -23,13 +23,16 @@ financial-fraud-detection/
 │   ├── model_evaluator.py       # Model evaluation
 │   ├── cross_validator.py       # Cross-validation
 │   ├── hyperparameter_tuner.py  # Hyperparameter tuning
-│   └── model_pipeline.py        # Complete model pipeline
+│   ├── model_pipeline.py        # Complete model pipeline
+│   ├── model_explainer.py       # SHAP explainability
+│   ├── business_recommender.py   # Business recommendations
+│   └── explainability_pipeline.py # Complete explainability pipeline
 ├── notebooks/              # Interactive Jupyter notebooks
 │   ├── eda-fraud-data.ipynb
 │   ├── eda-creditcard.ipynb
 │   ├── feature-engineering.ipynb
 │   ├── modeling.ipynb           # Task 2: Model building
-│   └── shap-explainability.ipynb
+│   └── shap-explainability.ipynb # Task 3: Model explainability
 ├── models/                 # Model artifacts (see models/README.md)
 │   ├── *.joblib            # Saved trained models
 │   └── evaluation_outputs/ # Evaluation visualizations
@@ -163,6 +166,25 @@ results = model_pipeline.build_and_evaluate_models(
 )
 ```
 
+### 5. Explain Model (Task 3)
+
+```python
+from src.explainability_pipeline import ExplainabilityPipeline
+
+explainability = ExplainabilityPipeline()
+results = explainability.explain_model(
+    model=best_model,
+    X_train=X_train,
+    X_test=X_test,
+    y_test=y_test,
+    model_name="Random Forest"
+)
+
+# Access recommendations
+for rec in results['recommendations']:
+    print(f"{rec['title']}: {rec['recommendation']}")
+```
+
 ## Testing
 
 ### Run All Tests
@@ -237,6 +259,16 @@ pytest tests/ -v --tb=short
 - ✅ Model comparison and selection
 - ✅ Model persistence (save/load)
 
+### Task 3: Model Explainability
+- ✅ Built-in feature importance extraction and visualization
+- ✅ SHAP summary plot (global feature importance)
+- ✅ SHAP force plots for individual predictions (TP, FP, FN)
+- ✅ Feature importance comparison (built-in vs SHAP)
+- ✅ Top 5 fraud prediction drivers identification
+- ✅ Individual prediction analysis with detailed explanations
+- ✅ Business recommendations generator with SHAP justification
+- ✅ Automatic case finding (True Positive, False Positive, False Negative)
+
 ## Datasets
 
 ### Credit Card Fraud Detection
@@ -269,6 +301,16 @@ results = modeler.build_and_evaluate_models(df, target_column="class")
 
 # 3. Access best model
 best_model = results['best_model']['model']
+
+# 4. Explain model predictions
+from src.explainability_pipeline import ExplainabilityPipeline
+explainability = ExplainabilityPipeline()
+explain_results = explainability.explain_model(
+    model=best_model,
+    X_train=X_train,
+    X_test=X_test,
+    y_test=y_test
+)
 ```
 
 ### Individual Modules
@@ -294,6 +336,7 @@ metrics = evaluator.evaluate_model(model, X_test, y_test)
 ## Notebooks
 
 - **`notebooks/modeling.ipynb`** - Complete model building pipeline (Task 2)
+- **`notebooks/shap-explainability.ipynb`** - Model explainability with SHAP (Task 3)
 - **`notebooks/eda-fraud-data.ipynb`** - EDA for fraud data
 - **`notebooks/feature-engineering.ipynb`** - Feature engineering examples
 
@@ -314,7 +357,7 @@ See `requirements.txt` for complete list.
 
 - ✅ **Task 1:** Data preprocessing pipeline complete
 - ✅ **Task 2:** Model building and training complete
-- 🔄 **Task 3:** Model explainability (SHAP) - In progress
+- ✅ **Task 3:** Model explainability (SHAP) complete
 
 ## Contributing
 

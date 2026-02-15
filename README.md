@@ -415,12 +415,119 @@ See `requirements.txt` for complete list.
 - ✅ **Task 2:** Model building and training complete
 - ✅ **Task 3:** Model explainability (SHAP) complete
 
+## CI/CD Pipeline
+
+This project includes a comprehensive CI/CD pipeline using GitHub Actions to ensure code quality, security, and reliability.
+
+### Automated Quality Gates
+
+The CI/CD pipeline runs automatically on:
+- **Push** to `main`, `develop`, or `task-*` branches
+- **Pull Requests** to `main` or `develop`
+- **Manual trigger** via workflow_dispatch
+
+### Pipeline Stages
+
+#### 1. Code Linting (`lint` job)
+- **Black**: Code formatting check
+- **isort**: Import sorting verification
+- **Flake8**: Code quality and style enforcement
+- **Pylint**: Static code analysis
+
+#### 2. Type Checking (`type-check` job)
+- **MyPy**: Static type checking for Python code
+- Validates type hints and catches type-related errors
+
+#### 3. Testing (`test` job)
+- **Unit Tests**: All unit tests run across Python 3.10, 3.11, 3.12
+- **Integration Tests**: End-to-end pipeline tests
+- **Coverage**: Minimum 70% code coverage required
+- **Reports**: Coverage reports uploaded to Codecov and as artifacts
+
+#### 4. Security Scanning (`security` job)
+- **Safety**: Dependency vulnerability scanning
+- **Bandit**: Security linter for common vulnerabilities
+
+#### 5. Build Verification (`build` job)
+- Verifies all critical imports work correctly
+- Confirms code is ready for deployment
+
+### Local Development
+
+Run quality checks locally before pushing:
+
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Format code
+black src/ tests/
+isort src/ tests/
+
+# Run linting
+flake8 src/ tests/
+pylint src/
+
+# Type checking
+mypy src/
+
+# Security scanning
+safety check --file requirements.txt
+bandit -r src/
+
+# Run tests with coverage
+pytest tests/ --cov=src --cov-report=term-missing
+```
+
+### CI/CD Configuration Files
+
+- **`.github/workflows/ci.yml`**: Main CI/CD pipeline
+- **`.github/workflows/unittests.yml`**: Dedicated test workflow
+- **`.flake8`**: Flake8 linting configuration
+- **`.pylintrc`**: Pylint configuration
+- **`pyproject.toml`**: Black, isort, mypy, pytest, coverage configuration
+
+### Quality Metrics
+
+- **Code Coverage**: Minimum 70% (enforced)
+- **Python Versions**: 3.10, 3.11, 3.12 (tested)
+- **Line Length**: 127 characters (configurable)
+- **Complexity**: Maximum 10 (cyclomatic complexity)
+
+### Status Badges
+
+Add to your README to show CI/CD status:
+
+```markdown
+![CI/CD Pipeline](https://github.com/your-org/financial-fraud-detection/workflows/CI/CD%20Pipeline/badge.svg)
+![Tests](https://github.com/your-org/financial-fraud-detection/workflows/Unit%20Tests/badge.svg)
+![Coverage](https://codecov.io/gh/your-org/financial-fraud-detection/branch/main/graph/badge.svg)
+```
+
 ## Contributing
 
-1. Create a feature branch
+1. Create a feature branch from `develop`
 2. Write tests for new functionality
-3. Ensure all tests pass: `pytest tests/ -v`
-4. Submit a pull request
+3. Ensure all quality checks pass locally:
+   ```bash
+   black src/ tests/
+   flake8 src/ tests/
+   pytest tests/ --cov=src
+   ```
+4. Push changes (CI/CD will run automatically)
+5. Ensure all CI/CD checks pass
+6. Submit a pull request
+
+### Pre-commit Hooks (Optional)
+
+Install pre-commit hooks for automatic checks:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+This will run linting and formatting checks before each commit.
 
 ## License
 

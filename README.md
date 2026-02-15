@@ -26,7 +26,8 @@ financial-fraud-detection/
 │   ├── model_pipeline.py        # Complete model pipeline
 │   ├── model_explainer.py       # SHAP explainability
 │   ├── business_recommender.py   # Business recommendations
-│   └── explainability_pipeline.py # Complete explainability pipeline
+│   ├── explainability_pipeline.py # Complete explainability pipeline
+│   └── explainability_service.py  # Production explainability service
 ├── notebooks/              # Interactive Jupyter notebooks
 │   ├── eda-fraud-data.ipynb
 │   ├── eda-creditcard.ipynb
@@ -36,13 +37,23 @@ financial-fraud-detection/
 ├── models/                 # Model artifacts (see models/README.md)
 │   ├── *.joblib            # Saved trained models
 │   └── evaluation_outputs/ # Evaluation visualizations
+├── dashboard/              # Interactive web dashboard (see dashboard/README.md)
+│   ├── app.py             # Streamlit dashboard application
+│   └── README.md          # Dashboard documentation
+├── api/                    # Production API services (see api/README.md)
+│   ├── explainability_api.py  # REST API for SHAP explanations
+│   └── README.md          # API documentation
 ├── reports/                 # Project reports (see reports/README.md)
 │   └── INTERIM_REPORT_TASK1.md
 ├── tests/                   # Test suite (see tests/README.md)
 │   ├── unit/               # Unit tests
 │   └── integration/        # Integration tests
 ├── scripts/                 # Utility scripts
-│   └── generate_visualizations.py
+│   ├── generate_visualizations.py
+│   ├── run_dashboard.sh   # Dashboard startup script
+│   ├── train_model.py     # Quick model training script
+│   ├── fix_dependencies.sh # Dependency compatibility fix
+│   └── run_explainability_api.sh # API startup script
 └── requirements.txt         # Python dependencies
 ```
 
@@ -107,6 +118,17 @@ financial-fraud-detection/
 
 **See**: `tests/README.md` for testing guidelines.
 
+### `dashboard/` - Interactive Dashboard
+
+**Purpose**: Web-based interface for stakeholders to explore predictions and insights.
+
+- **Streamlit Application**: Interactive dashboard for fraud analysis
+- **Real-Time Predictions**: Make predictions for individual transactions
+- **SHAP Explanations**: Understand fraud drivers visually
+- **Scenario Testing**: Test different transaction scenarios
+
+**See**: `dashboard/README.md` for detailed usage guide.
+
 ### `scripts/` - Utility Scripts
 
 **Purpose**: Standalone utility scripts for automation.
@@ -114,6 +136,7 @@ financial-fraud-detection/
 - Data generation scripts
 - Visualization generation
 - Batch processing utilities
+- Dashboard startup script
 
 ## Quick Start
 
@@ -324,6 +347,9 @@ For financial applications, comprehensive testing is critical:
 - ✅ Individual prediction analysis with detailed explanations
 - ✅ Business recommendations generator with SHAP justification
 - ✅ Automatic case finding (True Positive, False Positive, False Negative)
+- ✅ **Production Explainability Service**: Reusable service for on-demand SHAP explanations
+- ✅ **REST API**: Microservice API for real-time explainability
+- ✅ **Dashboard Integration**: Real-time SHAP explanations in interactive dashboard
 
 ## Datasets
 
@@ -388,6 +414,37 @@ model = trainer.train_random_forest(X_train, y_train)
 evaluator = ModelEvaluator()
 metrics = evaluator.evaluate_model(model, X_test, y_test)
 ```
+
+## Interactive Dashboard
+
+A web-based dashboard for fraud analysts, product managers, and business stakeholders to explore predictions, test scenarios, and understand fraud drivers without writing code.
+
+### Quick Start
+
+**First Time Setup:**
+```bash
+# 1. Train a model (if you don't have one)
+python scripts/train_model.py
+
+# 2. Run the dashboard
+streamlit run dashboard/app.py
+
+# Or use the helper script
+./scripts/run_dashboard.sh
+```
+
+The dashboard will open at `http://localhost:8501`
+
+**Note**: If you see "No models found", you need to train a model first using `scripts/train_model.py` or the modeling notebook.
+
+### Dashboard Features
+
+- **🔮 Real-Time Predictions**: Make fraud predictions for individual transactions or batch CSV files
+- **📈 Model Performance**: View model metrics, ROC/PR curves, and confusion matrices
+- **🔍 Fraud Drivers**: Explore SHAP explanations to understand what drives fraud predictions
+- **🧪 Scenario Testing**: Test different transaction scenarios and visualize prediction changes
+
+**See**: `dashboard/README.md` for detailed documentation.
 
 ## Notebooks
 

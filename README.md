@@ -187,30 +187,62 @@ for rec in results['recommendations']:
 
 ## Testing
 
-### Run All Tests
+This project includes comprehensive unit and integration tests to ensure code correctness, reliability, and regulatory compliance for financial applications.
+
+### Test Structure
+
+- **Unit Tests** (`tests/unit/`): Test individual modules in isolation
+  - Data processing: `DataLoader`, `DataCleaner`, `FeatureEngineer`, `ImbalanceHandler`, `DataTransformer`
+  - Model training: `ModelTrainer`, `ModelEvaluator`, `CrossValidator`, `DataPreparator`
+  - Geolocation: `GeolocationMapper`
+  
+- **Integration Tests** (`tests/integration/`): Test complete pipelines end-to-end
+  - `PreprocessingPipeline`: Full data preprocessing workflow
+  - `ModelPipeline`: Complete model training workflow
+
+### Running Tests
+
+#### Run All Tests
 
 ```bash
 # From project root
 pytest tests/ -v
 ```
 
-### Run Unit Tests Only
+#### Run Unit Tests Only
 
 ```bash
 pytest tests/unit/ -v
 ```
 
-### Run Integration Tests Only
+#### Run Integration Tests Only
 
 ```bash
 pytest tests/integration/ -v
 ```
 
-### Run with Coverage Report
+#### Run Specific Test File
 
 ```bash
-# Generate coverage report
-pytest tests/ --cov=src --cov-report=html --cov-report=term
+pytest tests/unit/test_data_loader.py -v
+```
+
+#### Run Specific Test Function
+
+```bash
+pytest tests/unit/test_data_loader.py::TestDataLoader::test_load_csv_success -v
+```
+
+### Coverage Reports
+
+#### Generate Coverage Report
+
+```bash
+# Terminal report with missing lines
+pytest tests/ --cov=src --cov-report=term-missing
+
+# HTML report (generated in htmlcov/)
+pytest tests/ --cov=src --cov-report=html
 
 # View HTML report
 open htmlcov/index.html  # Mac/Linux
@@ -218,25 +250,49 @@ open htmlcov/index.html  # Mac/Linux
 start htmlcov/index.html  # Windows
 ```
 
-### End-to-End Testing
+#### Coverage Requirements
 
-To test the complete pipeline end-to-end:
+- **Minimum Coverage**: 70% (configured in `pytest.ini`)
+- **Current Status**: Tests cover all core functionality including:
+  - Feature engineering (transaction frequency, velocity, time features)
+  - SMOTE handling and class imbalance mitigation
+  - Model scoring and evaluation metrics
+  - Data preprocessing pipelines
+  - Model training and persistence
 
-```bash
-# 1. Run unit tests
-pytest tests/unit/ -v
+### Key Test Scenarios
 
-# 2. Run integration tests (requires data files)
-pytest tests/integration/ -v
+**Data Processing:**
+- ✅ CSV loading with validation and error handling
+- ✅ Missing value imputation (mean, median, mode, KNN)
+- ✅ Duplicate removal and data type correction
+- ✅ Feature engineering (time features, transaction frequency/velocity)
+- ✅ SMOTE resampling and class distribution verification
+- ✅ Data transformation (scaling, encoding)
 
-# 3. Check coverage
-pytest tests/ --cov=src --cov-report=term-missing
+**Model Training:**
+- ✅ Stratified train-test split with class distribution preservation
+- ✅ Baseline model training (Logistic Regression)
+- ✅ Ensemble model training (Random Forest, XGBoost, LightGBM)
+- ✅ Model evaluation metrics (PR-AUC, F1-Score, ROC-AUC)
+- ✅ Cross-validation with stratified K-Fold
+- ✅ Model persistence (save/load)
 
-# 4. Run with verbose output
-pytest tests/ -v --tb=short
-```
+**Integration:**
+- ✅ Complete preprocessing pipeline (fraud data and credit card data)
+- ✅ End-to-end model training workflow
+- ✅ Model comparison and selection
 
-**Note**: Integration tests may require data files in `data/raw/`. See individual test files for requirements.
+### Regulatory Compliance
+
+For financial applications, comprehensive testing is critical:
+
+- **Correctness**: All core functions verified (feature engineering, SMOTE handling, model scoring)
+- **Reproducibility**: Fixed random seeds ensure consistent results
+- **Documentation**: All tests documented for audit purposes
+- **Coverage**: High test coverage demonstrates thoroughness
+
+**See**: `tests/README.md` for detailed testing documentation.
 
 ## Features
 

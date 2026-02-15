@@ -498,7 +498,98 @@ Our feature engineering strategy directly addresses the security-UX balance:
 
 ---
 
-## 9. Conclusion
+## 9. Project Limitations and Future Work
+
+### 9.1 Data Limitations
+
+**Data Quality and Availability:**
+- **Missing IP Country Mapping**: Some IP addresses may not map to countries if IP ranges are incomplete or outdated, affecting geographic risk analysis
+- **Temporal Coverage**: Datasets represent specific time periods; fraud patterns evolve over time requiring continuous model updates
+- **Feature Availability**: Critical features (device fingerprinting, behavioral biometrics, network analysis) not available in current datasets limit model performance
+- **Class Imbalance**: Extreme imbalance in banking dataset (598:1) requires aggressive resampling, potentially losing valuable majority class information
+- **Data Scope**: E-commerce dataset limited to specific transaction types; banking dataset uses PCA-transformed features (V1-V28) limiting interpretability and feature engineering
+
+**Data Quality Constraints:**
+- **Label Quality**: Assumes ground truth labels are accurate; mislabeled data could significantly impact model performance
+- **Temporal Bias**: Models trained on historical data may not reflect current or future fraud patterns
+- **Geographic Coverage**: IP-to-country mapping may have gaps for certain regions, VPN/proxy usage, or mobile networks
+
+### 9.2 Model Limitations
+
+**Performance Constraints:**
+- **False Negative Rate**: Current recall of 0.70 means 30% of fraud cases are missed, requiring threshold tuning for specific business needs
+- **False Positive Rate**: Precision of 0.81 means 19% of flagged transactions are legitimate, potentially impacting user experience
+- **Generalization**: Models trained on historical data may not generalize to new fraud patterns, evolving attack methods, or different transaction types
+- **Model Architecture**: Random Forest limited depth may miss complex feature interactions; single ensemble method limits diversity
+
+**Evaluation Limitations:**
+- **Single Test Set**: Single train-test split may not capture model variance across different data distributions
+- **Temporal Validation**: No time-based validation; future fraud patterns may differ significantly from training period
+- **External Validation**: No validation on external datasets or different time periods to assess true generalization
+- **Business Metrics**: PR-AUC and F1-Score may not fully capture business impact (cost of false negatives vs false positives)
+
+### 9.3 Methodology Constraints
+
+**Preprocessing Limitations:**
+- **Imputation Strategy**: Mean/median imputation may not capture complex missing data patterns or relationships
+- **Feature Engineering**: Time-based features assume consistent timezone; may need adjustment for global operations
+- **Resampling Trade-offs**: SMOTE creates synthetic samples that may not reflect real fraud patterns; undersampling loses majority class information
+- **Scalability**: Current pipeline processes data in-memory; may need distributed processing for very large datasets (>10M records)
+
+**Model Training Constraints:**
+- **Hyperparameter Scope**: Limited hyperparameter tuning due to computational constraints; exhaustive search not performed
+- **Computational Resources**: Training time and memory usage may limit model complexity and feature engineering options
+- **Threshold Optimization**: Fixed threshold (0.5) may not be optimal for business objectives; cost-sensitive threshold tuning needed
+
+**Explainability Constraints:**
+- **SHAP Computation**: SHAP analysis performed on sample subset (1,000 instances); may not capture full dataset patterns
+- **Feature Interactions**: SHAP values show marginal contributions; complex feature interactions may not be fully captured
+- **Interpretation Complexity**: Technical SHAP explanations may need simplification for non-technical stakeholders
+- **Real-time Explainability**: SHAP computation time may be too slow for real-time fraud detection in production
+
+### 9.4 Future Work and Improvements
+
+**Data Enhancements:**
+1. **Real-time Data Integration**: Integrate live transaction streams for real-time fraud detection and immediate response
+2. **Additional Data Sources**: Incorporate device fingerprinting, behavioral biometrics, network analysis, and social network data
+3. **External Features**: Integrate credit bureau data, blacklist databases, and third-party fraud intelligence feeds
+4. **Temporal Updates**: Implement automated data refresh pipelines to capture evolving fraud patterns and concept drift
+
+**Model Improvements:**
+1. **Advanced Algorithms**: Explore Deep Learning, Neural Networks, and advanced ensemble methods (stacking, blending)
+2. **Hyperparameter Optimization**: Implement Bayesian Optimization (Optuna, Hyperopt) for efficient hyperparameter search
+3. **Multi-Objective Optimization**: Optimize for both performance metrics and business objectives simultaneously
+4. **Transfer Learning**: Explore transfer learning from related fraud detection domains or similar datasets
+
+**Methodology Enhancements:**
+1. **Advanced Imputation**: Implement MICE (Multiple Imputation by Chained Equations) for better missing value handling
+2. **Feature Selection**: Add automated feature selection to reduce dimensionality and improve model performance
+3. **Ensemble Resampling**: Combine multiple resampling techniques (SMOTE + ADASYN) for better minority class representation
+4. **Distributed Processing**: Implement Spark-based preprocessing and training for large-scale data processing
+
+**Explainability Improvements:**
+1. **SHAP Interaction Values**: Compute SHAP interaction values to understand complex feature interactions
+2. **Counterfactual Explanations**: Generate "what-if" scenarios for fraud predictions to improve interpretability
+3. **Real-time SHAP**: Implement optimized SHAP computation for real-time fraud detection explanations
+4. **Automated Reporting**: Generate automated SHAP-based fraud analysis reports for stakeholders
+
+**Production Readiness:**
+1. **Model Versioning**: Implement MLflow or similar for model versioning, tracking, and reproducibility
+2. **A/B Testing Framework**: Enable experimentation with different models and strategies in production
+3. **Automated Monitoring**: Add data quality monitoring, model performance tracking, and drift detection
+4. **Continuous Retraining**: Automate periodic model retraining with recent data to maintain performance
+5. **Performance Optimization**: Add caching, parallel processing, and model serving optimization for production scale
+
+**Research Directions:**
+1. **Anomaly Detection**: Combine classification with anomaly detection for novel fraud pattern identification
+2. **Active Learning**: Implement active learning for efficient labeling of uncertain cases
+3. **Semi-Supervised Learning**: Leverage unlabeled data for improved model performance
+4. **Causal Inference**: Integrate causal inference methods to identify true fraud drivers vs. correlations
+5. **Explainability Metrics**: Develop metrics to quantify explanation quality and usefulness for business stakeholders
+
+---
+
+## 10. Conclusion
 
 This report documents a production-ready data preprocessing pipeline implemented using OOP principles with comprehensive error handling and logging.
 

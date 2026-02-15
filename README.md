@@ -23,13 +23,16 @@ financial-fraud-detection/
 │   ├── model_evaluator.py       # Model evaluation
 │   ├── cross_validator.py       # Cross-validation
 │   ├── hyperparameter_tuner.py  # Hyperparameter tuning
-│   └── model_pipeline.py        # Complete model pipeline
+│   ├── model_pipeline.py        # Complete model pipeline
+│   ├── model_explainer.py       # SHAP explainability
+│   ├── business_recommender.py   # Business recommendations
+│   └── explainability_pipeline.py # Complete explainability pipeline
 ├── notebooks/              # Interactive Jupyter notebooks
 │   ├── eda-fraud-data.ipynb
 │   ├── eda-creditcard.ipynb
 │   ├── feature-engineering.ipynb
 │   ├── modeling.ipynb           # Task 2: Model building
-│   └── shap-explainability.ipynb
+│   └── shap-explainability.ipynb # Task 3: Model explainability
 ├── models/                 # Model artifacts (see models/README.md)
 │   ├── *.joblib            # Saved trained models
 │   └── evaluation_outputs/ # Evaluation visualizations
@@ -163,32 +166,83 @@ results = model_pipeline.build_and_evaluate_models(
 )
 ```
 
+### 5. Explain Model (Task 3)
+
+```python
+from src.explainability_pipeline import ExplainabilityPipeline
+
+explainability = ExplainabilityPipeline()
+results = explainability.explain_model(
+    model=best_model,
+    X_train=X_train,
+    X_test=X_test,
+    y_test=y_test,
+    model_name="Random Forest"
+)
+
+# Access recommendations
+for rec in results['recommendations']:
+    print(f"{rec['title']}: {rec['recommendation']}")
+```
+
 ## Testing
 
-### Run All Tests
+This project includes comprehensive unit and integration tests to ensure code correctness, reliability, and regulatory compliance for financial applications.
+
+### Test Structure
+
+- **Unit Tests** (`tests/unit/`): Test individual modules in isolation
+  - Data processing: `DataLoader`, `DataCleaner`, `FeatureEngineer`, `ImbalanceHandler`, `DataTransformer`
+  - Model training: `ModelTrainer`, `ModelEvaluator`, `CrossValidator`, `DataPreparator`
+  - Geolocation: `GeolocationMapper`
+  
+- **Integration Tests** (`tests/integration/`): Test complete pipelines end-to-end
+  - `PreprocessingPipeline`: Full data preprocessing workflow
+  - `ModelPipeline`: Complete model training workflow
+
+### Running Tests
+
+#### Run All Tests
 
 ```bash
 # From project root
 pytest tests/ -v
 ```
 
-### Run Unit Tests Only
+#### Run Unit Tests Only
 
 ```bash
 pytest tests/unit/ -v
 ```
 
-### Run Integration Tests Only
+#### Run Integration Tests Only
 
 ```bash
 pytest tests/integration/ -v
 ```
 
-### Run with Coverage Report
+#### Run Specific Test File
 
 ```bash
-# Generate coverage report
-pytest tests/ --cov=src --cov-report=html --cov-report=term
+pytest tests/unit/test_data_loader.py -v
+```
+
+#### Run Specific Test Function
+
+```bash
+pytest tests/unit/test_data_loader.py::TestDataLoader::test_load_csv_success -v
+```
+
+### Coverage Reports
+
+#### Generate Coverage Report
+
+```bash
+# Terminal report with missing lines
+pytest tests/ --cov=src --cov-report=term-missing
+
+# HTML report (generated in htmlcov/)
+pytest tests/ --cov=src --cov-report=html
 
 # View HTML report
 open htmlcov/index.html  # Mac/Linux
@@ -196,25 +250,49 @@ open htmlcov/index.html  # Mac/Linux
 start htmlcov/index.html  # Windows
 ```
 
-### End-to-End Testing
+#### Coverage Requirements
 
-To test the complete pipeline end-to-end:
+- **Minimum Coverage**: 70% (configured in `pytest.ini`)
+- **Current Status**: Tests cover all core functionality including:
+  - Feature engineering (transaction frequency, velocity, time features)
+  - SMOTE handling and class imbalance mitigation
+  - Model scoring and evaluation metrics
+  - Data preprocessing pipelines
+  - Model training and persistence
 
-```bash
-# 1. Run unit tests
-pytest tests/unit/ -v
+### Key Test Scenarios
 
-# 2. Run integration tests (requires data files)
-pytest tests/integration/ -v
+**Data Processing:**
+- ✅ CSV loading with validation and error handling
+- ✅ Missing value imputation (mean, median, mode, KNN)
+- ✅ Duplicate removal and data type correction
+- ✅ Feature engineering (time features, transaction frequency/velocity)
+- ✅ SMOTE resampling and class distribution verification
+- ✅ Data transformation (scaling, encoding)
 
-# 3. Check coverage
-pytest tests/ --cov=src --cov-report=term-missing
+**Model Training:**
+- ✅ Stratified train-test split with class distribution preservation
+- ✅ Baseline model training (Logistic Regression)
+- ✅ Ensemble model training (Random Forest, XGBoost, LightGBM)
+- ✅ Model evaluation metrics (PR-AUC, F1-Score, ROC-AUC)
+- ✅ Cross-validation with stratified K-Fold
+- ✅ Model persistence (save/load)
 
-# 4. Run with verbose output
-pytest tests/ -v --tb=short
-```
+**Integration:**
+- ✅ Complete preprocessing pipeline (fraud data and credit card data)
+- ✅ End-to-end model training workflow
+- ✅ Model comparison and selection
 
-**Note**: Integration tests may require data files in `data/raw/`. See individual test files for requirements.
+### Regulatory Compliance
+
+For financial applications, comprehensive testing is critical:
+
+- **Correctness**: All core functions verified (feature engineering, SMOTE handling, model scoring)
+- **Reproducibility**: Fixed random seeds ensure consistent results
+- **Documentation**: All tests documented for audit purposes
+- **Coverage**: High test coverage demonstrates thoroughness
+
+**See**: `tests/README.md` for detailed testing documentation.
 
 ## Features
 
@@ -236,6 +314,16 @@ pytest tests/ -v --tb=short
 - ✅ Hyperparameter tuning with RandomizedSearchCV
 - ✅ Model comparison and selection
 - ✅ Model persistence (save/load)
+
+### Task 3: Model Explainability
+- ✅ Built-in feature importance extraction and visualization
+- ✅ SHAP summary plot (global feature importance)
+- ✅ SHAP force plots for individual predictions (TP, FP, FN)
+- ✅ Feature importance comparison (built-in vs SHAP)
+- ✅ Top 5 fraud prediction drivers identification
+- ✅ Individual prediction analysis with detailed explanations
+- ✅ Business recommendations generator with SHAP justification
+- ✅ Automatic case finding (True Positive, False Positive, False Negative)
 
 ## Datasets
 
@@ -269,6 +357,16 @@ results = modeler.build_and_evaluate_models(df, target_column="class")
 
 # 3. Access best model
 best_model = results['best_model']['model']
+
+# 4. Explain model predictions
+from src.explainability_pipeline import ExplainabilityPipeline
+explainability = ExplainabilityPipeline()
+explain_results = explainability.explain_model(
+    model=best_model,
+    X_train=X_train,
+    X_test=X_test,
+    y_test=y_test
+)
 ```
 
 ### Individual Modules
@@ -294,6 +392,7 @@ metrics = evaluator.evaluate_model(model, X_test, y_test)
 ## Notebooks
 
 - **`notebooks/modeling.ipynb`** - Complete model building pipeline (Task 2)
+- **`notebooks/shap-explainability.ipynb`** - Model explainability with SHAP (Task 3)
 - **`notebooks/eda-fraud-data.ipynb`** - EDA for fraud data
 - **`notebooks/feature-engineering.ipynb`** - Feature engineering examples
 
@@ -314,7 +413,7 @@ See `requirements.txt` for complete list.
 
 - ✅ **Task 1:** Data preprocessing pipeline complete
 - ✅ **Task 2:** Model building and training complete
-- 🔄 **Task 3:** Model explainability (SHAP) - In progress
+- ✅ **Task 3:** Model explainability (SHAP) complete
 
 ## Contributing
 

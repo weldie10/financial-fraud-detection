@@ -1,0 +1,55 @@
+[MASTER]
+# Pylint configuration for financial fraud detection project
+
+# Python version
+py-version=3.10
+
+# Load plugins
+load-plugins=pylint.extensions.check_ast
+
+# Ignore patterns
+ignore=venv,env,.venv,.git,__pycache__,*.pyc,build,dist,htmlcov,.pytest_cache
+
+# Ignore specific modules
+ignore-patterns=^test_.*\.py$
+
+[MESSAGES CONTROL]
+# Disable specific checks
+disable=
+    C0111,  # missing-docstring
+    C0103,  # invalid-name
+    R0913,  # too-many-arguments
+    R0914,  # too-many-locals
+    R0915,  # too-many-statements
+    W0613,  # unused-argument
+    C0301,  # line-too-long (handled by formatter)
+
+[FORMAT]
+# Maximum line length
+max-line-length=127
+
+# Indentation
+indent-after-paren=4
+indent-string='    '
+
+[BASIC]
+# Good variable names
+good-names=i,j,k,ex,Run,_,df,X,y,X_train,y_train,X_test,y_test
+
+# Bad variable names
+bad-names=foo,bar,baz,toto,tutu,tata
+
+[DESIGN]
+# Maximum arguments
+max-args=10
+max-locals=20
+max-returns=6
+max-branches=15
+max-statements=50
+
+[IMPORTS]
+# Import order
+import-order=google
+
+# Wildcard imports
+allow-wildcard-with-all=no

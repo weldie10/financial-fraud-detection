@@ -308,14 +308,17 @@ start htmlcov/index.html  # Windows
 
 ### Regulatory Compliance
 
-For financial applications, comprehensive testing is critical:
+For financial applications, comprehensive testing and governance documentation are critical:
 
 - **Correctness**: All core functions verified (feature engineering, SMOTE handling, model scoring)
 - **Reproducibility**: Fixed random seeds ensure consistent results
 - **Documentation**: All tests documented for audit purposes
 - **Coverage**: High test coverage demonstrates thoroughness
+- **Model Card**: Comprehensive governance documentation with intended use, factors, metrics, ethical considerations, and limitations
 
-**See**: `tests/README.md` for detailed testing documentation.
+**See**: 
+- `tests/README.md` for detailed testing documentation
+- `reports/MODEL_CARD.md` for comprehensive model governance documentation
 
 ## Features
 
